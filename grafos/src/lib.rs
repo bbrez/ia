@@ -26,8 +26,8 @@ impl Aresta {
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 struct Vertice {
-    id: u32,
-    tag: String,
+    id: u32,                       //Id do vertice, sua posição no vetor de vértices do grafo
+    tag: String,                   //"nome" do vertice, usado para identificação pelo usuario
     arestas: HashMap<u32, Aresta>, //HashMap sendo utilizado como vetor esparso, Arestas são inseridas no indice do id de seu destino
 }
 
@@ -41,7 +41,7 @@ impl Vertice {
         }
     }
 
-    pub fn set_aresta(mut self, peso: u32, destino: u32) {
+    pub fn set_aresta(&mut self, peso: u32, destino: u32) {
         self.arestas
             .entry(destino)
             .and_modify(|ar| ar.peso = peso)
@@ -87,20 +87,16 @@ impl Grafo {
             .find_map(|vert| if vert.tag == tag { Some(vert) } else { None })
     }
 
-    pub fn add_aresta(mut self, origem: u32, peso: u32, destino: u32) {}
+    pub fn get_vertice_by_id(&mut self, id: u32) -> Option<&mut Vertice> {
+        self.vertices
+            .iter_mut()
+            .find_map(|vert| if vert.id == id { Some(vert) } else { None })
+    }
 
-    // pub fn set_aresta(mut self, origem: u32, peso: u32, destino: u32) {
-    //     let vert = self.vertices.entry(origem).or_insert(Vertice::new(origem));
-    //     vert.arestas
-    //         .entry(destino)
-    //         .and_modify(|ar| ar.peso = peso)
-    //         .or_insert(Aresta::new(origem, peso, destino));
-    // }
-
-    // pub fn get_aresta(self, origem: u32, destino: u32) -> Option<Aresta> {
-    //     match self.vertices.get(&origem) {
-    //         Some(vert) => vert.arestas.get(&destino).cloned(),
-    //         None => None,
-    //     }
-    // }
+    pub fn add_aresta(mut self, origem: u32, peso: u32, destino: u32) {
+        let vert = self
+            .get_vertice_by_id(origem)
+            .expect("O vertice deve existir");
+        vert.set_aresta(peso, destino);
+    }
 }
