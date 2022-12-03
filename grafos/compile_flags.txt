@@ -1,0 +1,7 @@
+-Iinclude
+-std=c++20
+-xc++
+-Wall
+-Wextra
+-Wpedantic
+-Werror
