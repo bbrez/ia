@@ -1,0 +1,11 @@
+ilha_inicial(a).
+ilha_final(b).
+ponte(a,b,100).
+ponte(c,d,50).
+ponte(a,d,20).
+h(a,d,2).
+h(a,b,10).
+h(a,c,5).
+h(a,d,8).
+h(b,d,20). 
+h(c,d,10).
