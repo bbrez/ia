@@ -4,10 +4,12 @@
 #include <Grafo/Vertice.h>
 #include <Grafo/Aresta.h>
 #include <Grafo/Cor.h>
+#include <Grafo/Heuristica.h>
 
 #include <map>
 #include <string>
 #include <memory>
+#include <utility>
 
 namespace Grafos {
 class Grafo {
@@ -26,7 +28,7 @@ public:
 
     void dijkstra(const std::string& origem, const std::string& destino);
 
-    void a_star(const std::string& origem, const std::string& destino, std::map<std::string, int> heuristica);
+    void a_star(const std::string& origem, const std::string& destino, Heuristica heuristica);
 
     void to_dot(const std::string& filename);
 

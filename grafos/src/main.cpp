@@ -1,7 +1,6 @@
 #include <Grafo/Grafo.h>
 
 #include <iostream>
-#include <ostream>
 
 auto main() -> int {
     Grafos::Grafo g(false);

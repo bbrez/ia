@@ -11,6 +11,7 @@
 #include <set>
 #include <queue>
 #include <stack>
+#include <utility>
 
 namespace Grafos {
 Grafo::Grafo(bool isDirecionado) : isDirecionado(isDirecionado) {}
@@ -185,71 +186,7 @@ void Grafo::dijkstra(const std::string& origem, const std::string& destino) {
     std::cout << std::format("Caminho: {}", caminhoString) << std::endl;
 }
 
-void Grafo::a_star(const std::string& origem, const std::string& destino, std::map<std::string, int> heuristica) {
-    struct a_star_info {
-        int distancia;
-        std::string verticeAnterior;
-        Cor cor;
-    };
-
-    std::map<std::string, a_star_info> info;
-
-    for (auto& [nome, vertice] : vertices) {
-        info[nome] = {INT_MAX, "", Cor::BRANCO};
-    }
-
-    info[origem].distancia = 0;
-
-    // fila de prioridade para pegar o menor caminho
-    // o primeiro elemento da fila é o menor peso
-    std::priority_queue<std::pair<int, std::string>,               // pair<distancia, vertice>
-                        std::vector<std::pair<int, std::string>>,  // container da fila
-                        std::greater<std::pair<int, std::string>>> // comparação
-        fila;
-
-    fila.push({0, origem});
-
-    while (!fila.empty()) {
-        auto verticeAtual = fila.top();
-        fila.pop();
-
-        if (info[verticeAtual.second].cor == Cor::PRETO) {
-            continue;
-        }
-
-        info[verticeAtual.second].cor = Cor::PRETO;
-
-        for (auto& [nomeAresta, aresta] : vertices[verticeAtual.second]->getArestas()) {
-            if (info[nomeAresta].cor == Cor::PRETO) {
-                continue;
-            }
-
-            if (info[nomeAresta].distancia > info[verticeAtual.second].distancia + aresta->getPeso()) {
-                info[nomeAresta].distancia = info[verticeAtual.second].distancia + aresta->getPeso();
-                info[nomeAresta].verticeAnterior = verticeAtual.second;
-                fila.push({info[nomeAresta].distancia + heuristica[nomeAresta], nomeAresta});
-            }
-        }
-    }
-
-    std::cout << std::format("Distancia de {} para {}: {}", origem, destino, info[destino].distancia) << std::endl;
-
-    std::stack<std::string> caminho;
-    caminho.push(destino);
-    while (info[caminho.top()].verticeAnterior != "") {
-        caminho.push(info[caminho.top()].verticeAnterior);
-    }
-
-    std::string caminhoString;
-    while (!caminho.empty()) {
-        caminhoString += caminho.top();
-        caminho.pop();
-
-        if (!caminho.empty()) {
-            caminhoString += " -> ";
-        }
-    }
-}
+void Grafo::a_star(const std::string& origem, const std::string& destino, Heuristica heuristica) {}
 
 void Grafo::to_dot(const std::string& filename) {
     std::ofstream file(filename);
