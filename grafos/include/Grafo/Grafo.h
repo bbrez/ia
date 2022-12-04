@@ -4,12 +4,14 @@
 #include <Grafo/Vertice.h>
 #include <Grafo/Aresta.h>
 #include <Grafo/Cor.h>
+#include <Grafo/Caminho.h>
 #include <Grafo/Heuristica.h>
 
 #include <map>
 #include <string>
 #include <memory>
 #include <utility>
+#include <optional>
 
 namespace Grafos {
 class Grafo {
@@ -23,12 +25,12 @@ public:
 
     void imprimirGrafo();
 
-    void buscaEmProfundidade();
-    void buscaEmLargura();
+    std::optional<Caminho> buscaEmProfundidade(const std::string& origem, const std::string& destino);
+    std::optional<Caminho> buscaEmLargura(const std::string& origem, const std::string& destino);
 
-    void dijkstra(const std::string& origem, const std::string& destino);
+    std::optional<Caminho> dijkstra(const std::string& origem, const std::string& destino);
 
-    void a_star(const std::string& origem, const std::string& destino, Heuristica heuristica);
+    std::optional<Caminho> a_star(const std::string& origem, const std::string& destino, Heuristica heuristica);
 
     void to_dot(const std::string& filename);
 

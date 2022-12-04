@@ -1,9 +1,11 @@
 #include <Grafo/Cor.h>
 #include <Grafo/Grafo.h>
+#include <Grafo/Caminho.h>
 
 #include <iostream>
 #include <fstream>
 #include <format>
+#include <optional>
 #include <string>
 #include <memory>
 
@@ -19,13 +21,19 @@ Grafo::Grafo(bool isDirecionado) : isDirecionado(isDirecionado) {}
 Grafo::~Grafo() {}
 
 void Grafo::adicionarVertice(const std::string& nome) {
-    if (vertices.find(nome) == vertices.end()) { vertices[nome] = std::make_shared<Vertice>(nome); }
+    if (vertices.find(nome) == vertices.end()) {
+        vertices[nome] = std::make_shared<Vertice>(nome);
+    }
 }
 
 void Grafo::adicionarAresta(const std::string& origem, const std::string& destino, int peso) {
-    if (vertices.find(origem) == vertices.end()) { adicionarVertice(origem); }
+    if (vertices.find(origem) == vertices.end()) {
+        adicionarVertice(origem);
+    }
 
-    if (vertices.find(destino) == vertices.end()) { adicionarVertice(destino); }
+    if (vertices.find(destino) == vertices.end()) {
+        adicionarVertice(destino);
+    }
 
     auto aresta = std::make_shared<Aresta>(peso);
     aresta->setOrigem(vertices[origem]);
@@ -52,70 +60,93 @@ void Grafo::imprimirGrafo() {
     }
 }
 
-void Grafo::buscaEmProfundidade() {
+std::optional<Caminho> Grafo::buscaEmProfundidade(const std::string& origem, const std::string& destino) {
+    if (vertices.find(origem) == vertices.end() || vertices.find(destino) == vertices.end()) {
+        std::cout << "Origem ou destino nao encontrados" << std::endl;
+        return std::nullopt;
+    }
+
+    Caminho caminho;
     std::map<std::string, Cor> cores;
-    for (auto& [nome, vertice] : vertices) { cores[nome] = Cor::BRANCO; }
-
-    std::function<void(std::shared_ptr<Vertice>)> visitar = [&](std::shared_ptr<Vertice> vertice) mutable {
-        cores[vertice->getNome()] = Cor::CINZA;
-        std::cout << std::format("Visitando vertice: {}", vertice->getNome()) << std::endl;
-
-        for (auto& [nomeAresta, aresta] : vertice->getArestas()) {
-            if (cores[nomeAresta] == Cor::BRANCO) {
-                std::cout << std::format("\tAresta: {} - Peso: {}", nomeAresta, aresta->getPeso()) << std::endl;
-                visitar(aresta->getDestino());
-            }
-        }
-
-        cores[vertice->getNome()] = Cor::PRETO;
-    };
 
     for (auto& [nome, vertice] : vertices) {
-        if (cores[nome] == Cor::BRANCO) { visitar(vertice); }
+        cores[nome] = Cor::BRANCO;
     }
+
+    std::stack<std::shared_ptr<Vertice>> pilha;
+    pilha.push(vertices[origem]);
+
+    while (!pilha.empty()) {
+        auto vertice = pilha.top();
+        pilha.pop();
+
+        if (cores[vertice->getNome()] == Cor::BRANCO) {
+            caminho.push_back(vertice);
+            cores[vertice->getNome()] = Cor::CINZA;
+
+            if (vertice->getNome() == destino) {
+                return caminho;
+            }
+
+            for (auto& [nome, aresta] : vertice->getArestas()) {
+                pilha.push(aresta->getDestino());
+            }
+        }
+    }
+
+    return std::nullopt;
 }
 
-void Grafo::buscaEmLargura() {
+std::optional<Caminho> Grafo::buscaEmLargura(const std::string& origem, const std::string& destino) {
+    if (vertices.find(origem) == vertices.end() || vertices.find(destino) == vertices.end()) {
+        std::cout << "Origem ou destino nao encontrados" << std::endl;
+        return std::nullopt;
+    }
+
+    Caminho caminho;
     std::map<std::string, Cor> cores;
-    for (auto& [nome, vertice] : vertices) { cores[nome] = Cor::BRANCO; }
+
+    for (auto& [nome, vertice] : vertices) {
+        cores[nome] = Cor::BRANCO;
+    }
 
     std::queue<std::shared_ptr<Vertice>> fila;
+    fila.push(vertices[origem]);
 
-    for (auto& [nome, vertice] : vertices) {
-        if (cores[nome] == Cor::BRANCO) {
-            cores[nome] = Cor::CINZA;
-            fila.push(vertice);
+    while (!fila.empty()) {
+        auto vertice = fila.front();
+        fila.pop();
 
-            while (!fila.empty()) {
-                auto verticeAtual = fila.front();
-                fila.pop();
+        if (cores[vertice->getNome()] == Cor::BRANCO) {
+            caminho.push_back(vertice);
+            cores[vertice->getNome()] = Cor::CINZA;
 
-                std::cout << std::format("Visitando vertice: {}", verticeAtual->getNome()) << std::endl;
+            if (vertice->getNome() == destino) {
+                return caminho;
+            }
 
-                for (auto& [nomeAresta, aresta] : verticeAtual->getArestas()) {
-                    if (cores[nomeAresta] == Cor::BRANCO) {
-                        std::cout << std::format("\tAresta: {} - Peso: {}", nomeAresta, aresta->getPeso()) << std::endl;
-                        cores[nomeAresta] = Cor::CINZA;
-                        fila.push(aresta->getDestino());
-                    }
-                }
-
-                cores[verticeAtual->getNome()] = Cor::PRETO;
+            for (auto& [nome, aresta] : vertice->getArestas()) {
+                fila.push(aresta->getDestino());
             }
         }
     }
+
+    return std::nullopt;
 }
 
-void Grafo::dijkstra(const std::string& origem, const std::string& destino) {
+std::optional<Caminho> Grafo::dijkstra(const std::string& origem, const std::string& destino) {
     struct dijkstra_info {
         int distancia;
         std::string verticeAnterior;
         Cor cor;
     };
 
+    Caminho caminho;
     std::map<std::string, dijkstra_info> info;
 
-    for (auto& [nome, vertice] : vertices) { info[nome] = {INT_MAX, "", Cor::BRANCO}; }
+    for (auto& [nome, vertice] : vertices) {
+        info[nome] = {INT_MAX, "", Cor::BRANCO};
+    }
 
     info[origem].distancia = 0;
 
@@ -129,42 +160,40 @@ void Grafo::dijkstra(const std::string& origem, const std::string& destino) {
     fila.push({0, origem});
 
     while (!fila.empty()) {
-        auto verticeAtual = fila.top();
+        auto [distancia, vertice] = fila.top();
         fila.pop();
 
-        if (info[verticeAtual.second].cor == Cor::PRETO) { continue; }
+        if (info[vertice].cor == Cor::BRANCO) {
+            info[vertice].cor = Cor::CINZA;
 
-        info[verticeAtual.second].cor = Cor::PRETO;
+            if (vertice == destino) {
+                caminho.push_back(vertices[vertice]);
 
-        for (auto& [nomeAresta, aresta] : vertices[verticeAtual.second]->getArestas()) {
-            if (info[nomeAresta].cor == Cor::PRETO) { continue; }
+                while (info[vertice].verticeAnterior != "") {
+                    vertice = info[vertice].verticeAnterior;
+                    caminho.push_back(vertices[vertice]);
+                }
 
-            if (info[nomeAresta].distancia > info[verticeAtual.second].distancia + aresta->getPeso()) {
-                info[nomeAresta].distancia = info[verticeAtual.second].distancia + aresta->getPeso();
-                info[nomeAresta].verticeAnterior = verticeAtual.second;
-                fila.push({info[nomeAresta].distancia, nomeAresta});
+                std::reverse(caminho.begin(), caminho.end());
+                return caminho;
+            }
+
+            for (auto& [nome, aresta] : vertices[vertice]->getArestas()) {
+                auto distanciaAtual = info[vertice].distancia + aresta->getPeso();
+
+                if (distanciaAtual < info[aresta->getDestino()->getNome()].distancia) {
+                    info[aresta->getDestino()->getNome()].distancia = distanciaAtual;
+                    info[aresta->getDestino()->getNome()].verticeAnterior = vertice;
+                    fila.push({distanciaAtual, aresta->getDestino()->getNome()});
+                }
             }
         }
     }
 
-    std::cout << std::format("Distancia de {} para {}: {}", origem, destino, info[destino].distancia) << std::endl;
-
-    std::stack<std::string> caminho;
-    caminho.push(destino);
-    while (info[caminho.top()].verticeAnterior != "") { caminho.push(info[caminho.top()].verticeAnterior); }
-
-    std::string caminhoString;
-    while (!caminho.empty()) {
-        caminhoString += caminho.top();
-        caminho.pop();
-
-        if (!caminho.empty()) { caminhoString += " -> "; }
-    }
-
-    std::cout << std::format("Caminho: {}", caminhoString) << std::endl;
+    return std::nullopt;
 }
 
-void Grafo::a_star(const std::string& origem, const std::string& destino, Heuristica heuristica) {
+std::optional<Caminho> Grafo::a_star(const std::string& origem, const std::string& destino, Heuristica heuristica) {
     struct a_star_info {
         int distancia;
         std::string verticeAnterior;
@@ -173,7 +202,9 @@ void Grafo::a_star(const std::string& origem, const std::string& destino, Heuris
 
     std::map<std::string, a_star_info> info;
 
-    for (auto& [nome, vertice] : vertices) { info[nome] = {INT_MAX, "", Cor::BRANCO}; }
+    for (auto& [nome, vertice] : vertices) {
+        info[nome] = {INT_MAX, "", Cor::BRANCO};
+    }
 
     info[origem].distancia = 0;
 
@@ -190,12 +221,16 @@ void Grafo::a_star(const std::string& origem, const std::string& destino, Heuris
         auto verticeAtual = fila.top();
         fila.pop();
 
-        if (info[verticeAtual.second].cor == Cor::PRETO) { continue; }
+        if (info[verticeAtual.second].cor == Cor::PRETO) {
+            continue;
+        }
 
         info[verticeAtual.second].cor = Cor::PRETO;
 
         for (auto& [nomeAresta, aresta] : vertices[verticeAtual.second]->getArestas()) {
-            if (info[nomeAresta].cor == Cor::PRETO) { continue; }
+            if (info[nomeAresta].cor == Cor::PRETO) {
+                continue;
+            }
 
             if (info[nomeAresta].distancia > info[verticeAtual.second].distancia + aresta->getPeso()) {
                 info[nomeAresta].distancia = info[verticeAtual.second].distancia + aresta->getPeso();
@@ -209,17 +244,23 @@ void Grafo::a_star(const std::string& origem, const std::string& destino, Heuris
 
     std::stack<std::string> caminho;
     caminho.push(destino);
-    while (info[caminho.top()].verticeAnterior != "") { caminho.push(info[caminho.top()].verticeAnterior); }
+    while (info[caminho.top()].verticeAnterior != "") {
+        caminho.push(info[caminho.top()].verticeAnterior);
+    }
 
     std::string caminhoString;
     while (!caminho.empty()) {
         caminhoString += caminho.top();
         caminho.pop();
 
-        if (!caminho.empty()) { caminhoString += " -> "; }
+        if (!caminho.empty()) {
+            caminhoString += " -> ";
+        }
     }
 
     std::cout << std::format("Caminho: {}", caminhoString) << std::endl;
+
+    return std::nullopt;
 }
 
 void Grafo::to_dot(const std::string& filename) {
@@ -244,13 +285,17 @@ void Grafo::to_dot(const std::string& filename) {
     file << "    sep = 1.5;" << std::endl;
     file << "    overlap = false;" << std::endl;
 
-    for (auto& [nome, vertice] : vertices) { file << std::format("\t{} [label=\"{}\"]", nome, nome) << std::endl; }
+    for (auto& [nome, vertice] : vertices) {
+        file << std::format("\t{} [label=\"{}\"]", nome, nome) << std::endl;
+    }
 
     std::set<std::pair<std::string, std::string>> arestasInseridas;
 
     for (auto& [nome, vertice] : vertices) {
         for (auto& [nomeAresta, aresta] : vertice->getArestas()) {
-            if (arestasInseridas.find({nome, nomeAresta}) != arestasInseridas.end()) { continue; }
+            if (arestasInseridas.find({nome, nomeAresta}) != arestasInseridas.end()) {
+                continue;
+            }
             if (this->isDirecionado) {
                 file << std::format("\t{} -> {} [xlabel=\"{}\"]", nome, nomeAresta, aresta->getPeso()) << std::endl;
                 arestasInseridas.insert({nome, nomeAresta});
