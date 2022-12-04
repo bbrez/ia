@@ -1,4 +1,5 @@
 #include <Grafo/Grafo.h>
+#include <Grafo/Heuristica.h>
 
 #include <iostream>
 
@@ -38,15 +39,24 @@ auto main() -> int {
     g.dijkstra("0", "6");
 
     std::cout << std::endl << "A* (heuristica: distancia euclidiana): " << std::endl;
-    std::map<std::string, int> heuristica = {
-        {"0", 10},
-        {"1",  8},
-        {"2",  7},
-        {"3",  6},
-        {"4",  5},
-        {"5",  4},
-        {"6",  0}
-    };
+
+    Grafos::Heuristica heuristica;
+    heuristica.adicionarHeuristica("a", "d", 2);
+    heuristica.adicionarHeuristica("a", "b", 10);
+    heuristica.adicionarHeuristica("a", "c", 5);
+    heuristica.adicionarHeuristica("a", "d", 8);
+    heuristica.adicionarHeuristica("b", "d", 20);
+    heuristica.adicionarHeuristica("c", "d", 10);
+
+    // std::map<std::string, int> heuristica = {
+    //     {"0", 10},
+    //     {"1",  8},
+    //     {"2",  7},
+    //     {"3",  6},
+    //     {"4",  5},
+    //     {"5",  4},
+    //     {"6",  0}
+    // };
 
     g.a_star("0", "6", heuristica);
 

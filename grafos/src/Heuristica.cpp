@@ -1,8 +1,6 @@
 #include <Grafo/Heuristica.h>
 
-namespace Grafo {
-Heuristica::Heuristica() = default;
-Heuristica::~Heuristica() = default;
+namespace Grafos {
 
 void Heuristica::adicionarHeuristica(const std::string& origem, const std::string& destino, int peso) {
     heuristica[origem][destino] = peso;
@@ -11,4 +9,4 @@ void Heuristica::adicionarHeuristica(const std::string& origem, const std::strin
 int Heuristica::getHeuristica(const std::string& origem, const std::string& destino) {
     return heuristica[origem][destino];
 }
-} // namespace Grafo
+} // namespace Grafos
