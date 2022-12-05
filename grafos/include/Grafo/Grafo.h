@@ -23,10 +23,12 @@ public:
     void adicionarVertice(const std::string& nome);
     void adicionarAresta(const std::string& origem, const std::string& destino, int peso);
 
-    void imprimirGrafo();
+    void imprimir();
 
     std::optional<Caminho> buscaEmProfundidade(const std::string& origem, const std::string& destino);
     std::optional<Caminho> buscaEmLargura(const std::string& origem, const std::string& destino);
+    std::optional<Caminho> piorCaso(const std::string& origem, const std::string& destino);
+
 
     std::optional<Caminho> dijkstra(const std::string& origem, const std::string& destino);
 

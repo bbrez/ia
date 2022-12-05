@@ -1,0 +1,45 @@
+ilha_inicial(Arad).
+ilha_final(Bucharest).
+ponte(Oradea,Zerind,71).
+ponte(Oradea,Sibiu,151).
+ponte(Zerind,Arad,75).
+ponte(Arad,Sibiu,140).
+ponte(Arad,Timisoara,118).
+ponte(Timisoara,Lugoj,111).
+ponte(Lugoj,Mehadia,70).
+ponte(Mehadia,Dobreta,75).
+ponte(Dobreta,Craiova,120).
+ponte(Craiova,Rimmicu Vilcea,146).
+ponte(Craiova,Pitesti,138).
+ponte(Rimmicu Vilcea,Pitesti,97).
+ponte(Sibiu,Rimmicu Vilcea,80).
+ponte(Sibiu,Fagaras,99).
+ponte(Fagaras,Bucharest,211).
+ponte(Pitesti,Bucharest,101).
+ponte(Bucharest,Giurgiu,90).
+ponte(Bucharest,Urziceni,86).
+ponte(Urziceni,Vaslui,142).
+ponte(Urziceni,Hirsova,98).
+ponte(Hirsova,Eforie,86).
+ponte(Vaslui,Iasi,92).
+ponte(Iasi,Neamt,87).
+h(Arad,Bucharest,366).
+h(Bucharest,Bucharest,0).
+h(Craiova,Bucharest,160).
+h(Dobreta,Bucharest,242).
+h(Eforie,Bucharest,161).
+h(Fagaras,Bucharest,178).
+h(Giurgiu,Bucharest,77).
+h(Hirsova,Bucharest,151).
+h(Iasi,Bucharest,226).
+h(Lugoj,Bucharest,244).
+h(Mehadia,Bucharest,241).
+h(Neamt,Bucharest,234).
+h(Oradea,Bucharest,380).
+h(Pitesti,Bucharest,98).
+h(Rimmicu Vilcea,Bucharest,193).
+h(Sibiu,Bucharest,253).
+h(Timisoara,Bucharest,329).
+h(Urziceni,Bucharest,80).
+h(Vaslui,Bucharest,199).
+h(Zerind,Bucharest,374).

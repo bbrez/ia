@@ -6,6 +6,28 @@
 #include <vector>
 #include <memory>
 
-typedef std::vector<std::shared_ptr<Grafos::Vertice>> Caminho;
+namespace Grafos {
+typedef std::vector<std::shared_ptr<Vertice>> caminho_t;
+
+class Caminho : public std::vector<std::shared_ptr<Vertice>> {
+private:
+
+    int visitados = 0;
+
+public:
+
+    Caminho() = default;
+    ~Caminho() = default;
+
+    void incrementarVisitados();
+
+    int getComprimento() const;
+    int getDistancia() const;
+    int getVisitados() const;
+
+    void imprimir();
+};
+
+} // namespace Grafos
 
 #endif
