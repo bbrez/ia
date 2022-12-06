@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <format>
 #include <optional>
 #include <string>
 #include <memory>
@@ -54,10 +53,10 @@ void Grafo::adicionarAresta(const std::string& origem, const std::string& destin
 
 void Grafo::imprimir() {
     for (auto& [nome, vertice] : vertices) {
-        std::cout << std::format("Vertice: {}", nome) << std::endl;
+        std::cout << "Vertice: " << nome << std::endl;
 
         for (auto& [nomeAresta, aresta] : vertice->getArestas()) {
-            std::cout << std::format("\tAresta: {} - Peso: {}", nomeAresta, aresta->getPeso()) << std::endl;
+            std::cout << "\tAresta: " << nomeAresta << " - Peso: " << aresta->getPeso() << std::endl;
         }
     }
 }
@@ -80,15 +79,15 @@ std::optional<Caminho> Grafo::buscaEmProfundidade(const std::string& origem, con
     std::stack<std::shared_ptr<Vertice>> pilha;
     pilha.push(vertices[origem]);
 
-    std::cout << std::format("Vertice inicial: {}", origem) << std::endl;
-    std::cout << std::format("Vertice final: {}", destino) << std::endl;
+    std::cout << "Vertice inicial: " << origem << std::endl;
+    std::cout << "Vertice final: " << destino << std::endl;
 
     while (!pilha.empty()) {
         auto vertice = pilha.top();
         pilha.pop();
         caminho.incrementarVisitados();
 
-        std::cout << std::format("Visitando vertice: {}", vertice->getNome()) << std::endl;
+        std::cout << "Visitando vertice: " << vertice->getNome() << std::endl;
 
         if (vertice->getNome() == destino) {
             std::cout << "Caminho encontrado" << std::endl;
@@ -109,7 +108,7 @@ std::optional<Caminho> Grafo::buscaEmProfundidade(const std::string& origem, con
 
             for (auto& [nomeAresta, aresta] : vertice->getArestas()) {
                 if (cores[aresta->getDestino()->getNome()] == Cor::BRANCO) {
-                    std::cout << std::format("\tEmpilhando vertice: {}", aresta->getDestino()->getNome()) << std::endl;
+                    std::cout << "\tEmpilhando vertice: " << aresta->getDestino()->getNome() << std::endl;
 
                     antecessores[aresta->getDestino()->getNome()] = vertice->getNome();
                     pilha.push(aresta->getDestino());
@@ -142,14 +141,14 @@ std::optional<Caminho> Grafo::buscaEmLargura(const std::string& origem, const st
     std::queue<std::shared_ptr<Vertice>> fila;
     fila.push(vertices[origem]);
 
-    std::cout << std::format("Vertice inicial: {}", origem) << std::endl;
+    std::cout << "Vertice inicial: " << origem << std::endl;
 
     while (!fila.empty()) {
         auto vertice = fila.front();
         fila.pop();
         caminho.incrementarVisitados();
 
-        std::cout << std::format("Visitando vertice: {}", vertice->getNome()) << std::endl;
+        std::cout << "Visitando vertice: " << vertice->getNome() << std::endl;
 
         if (vertice->getNome() == destino) {
             std::cout << "Caminho encontrado" << std::endl;
@@ -170,7 +169,7 @@ std::optional<Caminho> Grafo::buscaEmLargura(const std::string& origem, const st
 
             for (auto& [nomeAresta, aresta] : vertice->getArestas()) {
                 if (cores[aresta->getDestino()->getNome()] == Cor::BRANCO) {
-                    std::cout << std::format("\tEnfileirando vertice {}", aresta->getDestino()->getNome()) << std::endl;
+                    std::cout << "\tEnfileirando vertice " << aresta->getDestino()->getNome() << std::endl;
 
                     antecessores[aresta->getDestino()->getNome()] = vertice->getNome();
                     fila.push(aresta->getDestino());
@@ -237,14 +236,14 @@ std::optional<Caminho> Grafo::dijkstra(const std::string& origem, const std::str
 
     fila.push({0, origem});
 
-    std::cout << std::format("Vertice inicial: {}", origem) << std::endl;
+    std::cout << "Vertice inicial: " << origem << std::endl;
 
     while (!fila.empty()) {
         auto [distancia, vertice] = fila.top();
         fila.pop();
         caminho.incrementarVisitados();
 
-        std::cout << std::format("Visitando vertice {}", vertice) << std::endl;
+        std::cout << "Visitando vertice " << vertice << std::endl;
 
         if (info[vertice].cor == Cor::BRANCO) {
             info[vertice].cor = Cor::CINZA;
@@ -271,7 +270,7 @@ std::optional<Caminho> Grafo::dijkstra(const std::string& origem, const std::str
                     info[aresta->getDestino()->getNome()].verticeAnterior = vertice;
                     fila.push({distanciaAtual, aresta->getDestino()->getNome()});
 
-                    std::cout << std::format("\tEnfileirando aresta {}", nome) << std::endl;
+                    std::cout << "\tEnfileirando aresta " << nome << std::endl;
                 }
             }
         }
@@ -305,7 +304,7 @@ std::optional<Caminho> Grafo::a_star(const std::string& origem, const std::strin
 
     fila.push({0, origem});
 
-    std::cout << std::format("Vertice inicial: {}", origem) << std::endl;
+    std::cout << "Vertice inicial: " << origem << std::endl;
 
     Caminho caminho;
     while (!fila.empty()) {
@@ -314,7 +313,7 @@ std::optional<Caminho> Grafo::a_star(const std::string& origem, const std::strin
         caminho.incrementarVisitados();
 
 
-        std::cout << std::format("Visitando vertice {}", vertice) << std::endl;
+        std::cout << "Visitando vertice " << vertice << std::endl;
 
         if (info[vertice].cor == Cor::BRANCO) {
             info[vertice].cor = Cor::CINZA;
@@ -342,7 +341,7 @@ std::optional<Caminho> Grafo::a_star(const std::string& origem, const std::strin
                     fila.push({distanciaAtual + heuristica.getHeuristica(aresta->getDestino()->getNome(), destino),
                                aresta->getDestino()->getNome()});
 
-                    std::cout << std::format("\tEnfileirando aresta {}", nome) << std::endl;
+                    std::cout << "\tEnfileirando aresta " << nome << std::endl;
                 }
             }
         }
@@ -352,6 +351,7 @@ std::optional<Caminho> Grafo::a_star(const std::string& origem, const std::strin
     return std::nullopt;
 }
 
+/*
 void Grafo::to_dot(const std::string& filename) {
     std::ofstream file(filename);
     if (!file.is_open()) {
@@ -401,6 +401,6 @@ void Grafo::to_dot(const std::string& filename) {
     file.close();
 
     std::cout << "Arquivo gerado com sucesso" << std::endl;
-}
+}*/
 
 } // namespace Grafos

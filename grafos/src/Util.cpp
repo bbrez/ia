@@ -1,5 +1,7 @@
 #include <Util.h>
 
+#include <limits>
+
 namespace Util {
 std::string getOrigemDestino(std::ifstream& arquivo) {
     char buffer[20];
